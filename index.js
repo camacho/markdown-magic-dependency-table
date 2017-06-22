@@ -19,6 +19,14 @@ function findPkg(dir) {
   }
 }
 
+function sanitizeName(name, maxLength = 30) {
+  let gitIndex = name.indexOf('@git');
+  let str = gitIndex !== -1 ? name.substr(0, gitIndex) : name;
+  return str.length > maxLength
+    ? [str.substr(0, maxLength - 3), '...'].join('')
+    : str;
+}
+
 const readDependencies = pkg => (manifest, type) => {
   const dependencyType = type || 'production';
 
@@ -42,7 +50,7 @@ const readDependencies = pkg => (manifest, type) => {
       );
 
       return {
-        name,
+        name: sanitizeName(name),
         semver: dependencies[name],
         version,
         description,
