@@ -1,6 +1,6 @@
 {
   "name": "markdown-magic-dependency-table",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Generate table of information about dependencies automatically in markdown",
   "main": "index.js",
   "scripts": {
@@ -25,7 +25,8 @@
   "homepage": "https://github.com/camacho/markdown-magic-dependency-table#readme",
   "dependencies": {
     "findup": "^0.1.5",
-    "get-installed-path": "^2.0.3"
+    "get-installed-path": "^2.0.3",
+    "semver": "^5.3.0"
   },
   "devDependencies": {
     "markdown-magic": "^0.1.17",

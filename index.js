@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const findup = require('findup');
+const semver = require('semver');
 const getInstalledPath = require('get-installed-path');
 
 const defaults = {
@@ -9,6 +10,8 @@ const defaults = {
   peers: 'false',
   production: 'true',
 };
+
+const npmPkgUrl = 'https://npmjs.org/package/';
 
 function findPkg(dir) {
   try {
@@ -19,12 +22,43 @@ function findPkg(dir) {
   }
 }
 
-function sanitizeName(name, maxLength = 30) {
-  let gitIndex = name.indexOf('@git');
-  let str = gitIndex !== -1 ? name.substr(0, gitIndex) : name;
-  return str.length > maxLength
-    ? [str.substr(0, maxLength - 3), '...'].join('')
-    : str;
+function sanitizeSemver(version, maxLength = 10, truncateStr = '...') {
+  if (semver.valid(version)) return version;
+
+  const adjustedLength = maxLength - truncateStr.length;
+
+  return version.length > adjustedLength
+    ? [version.substr(0, adjustedLength), truncateStr].join('')
+    : version;
+}
+
+function convertRepositoryToUrl(repository, name) {
+  let repo = repository.url ? repository.url : repository;
+
+  if (repo.startsWith('git')) {
+    const [full, url] = repo.match(/^git\+ssh\:\/\/git\@(.*)\.git$/);
+    return [`https://`, url].join('');
+  } else if (repo.endsWith('.git')) {
+    return repo.substr(0, repo.length - 4);
+  } else if (!repo.startsWith('http')) {
+    return [npmPkgUrl, name].join('');
+  }
+
+  return repo;
+}
+
+function getPkgUrl(pkg) {
+  const {
+    name,
+    repository,
+    homepage,
+    bugs,
+  } = pkg;
+
+  if (homepage) return homepage;
+  if (repository) return convertRepositoryToUrl(repository, name);
+  if (bugs) return bugs.url || bugs;
+  return `https://npmjs.org/package/${name}`;
 }
 
 const readDependencies = pkg => (manifest, type) => {
@@ -45,16 +79,16 @@ const readDependencies = pkg => (manifest, type) => {
         'package.json'
       );
 
-      const { description, homepage, version } = JSON.parse(
-        fs.readFileSync(localPkgPath, 'utf8')
-      );
+      const localPkg = JSON.parse(fs.readFileSync(localPkgPath, 'utf8'));
+
+      const { description, homepage, version, repository } = localPkg;
 
       return {
-        name: sanitizeName(name),
-        semver: dependencies[name],
+        name,
+        semver: sanitizeSemver(dependencies[name]),
         version,
         description,
-        homepage: homepage || `https://www.npmjs.com/package/${name}`,
+        url: getPkgUrl(localPkg),
         dependencyType,
       };
     })
@@ -67,13 +101,13 @@ function renderDependencies(dependency) {
     semver,
     version,
     description,
-    homepage,
+    url,
     dependencyType,
   } = dependency;
 
   return [
     '',
-    `[${[name, semver].join('@')}](${homepage})`,
+    `[${[name, semver].join('@')}](${url})`,
     description,
     version,
     dependencyType,
