@@ -33,27 +33,26 @@ function sanitizeSemver(version, maxLength = 10, truncateStr = '...') {
 }
 
 function convertRepositoryToUrl(repository, name) {
-  let repo = repository.url ? repository.url : repository;
+  let repo = (repository.url ? repository.url : repository).replace('.git', '');
 
-  if (repo.startsWith('git')) {
-    const [full, url] = repo.match(/^git\+ssh\:\/\/git\@(.*)\.git$/);
+  if (repo.startsWith('http')) {
+    return repo;
+  } else if (repo.startsWith('git://')) {
+    return repo.replace('git://', 'https://');
+  } else if (repo.startsWith('git+ssh')) {
+    const [full, url] = repo.match(/^git\+ssh\:\/\/git\@(.*)$/);
     return [`https://`, url].join('');
-  } else if (repo.endsWith('.git')) {
-    return repo.substr(0, repo.length - 4);
-  } else if (!repo.startsWith('http')) {
-    return [npmPkgUrl, name].join('');
+  } else if (repo.startsWith('git@')) {
+    return repo.replace('git@', 'https://').replace(':', '/');
+  } else {
+    return ['https://github.com/', repo].join('');
   }
 
   return repo;
 }
 
 function getPkgUrl(pkg) {
-  const {
-    name,
-    repository,
-    homepage,
-    bugs,
-  } = pkg;
+  const { name, repository, homepage, bugs } = pkg;
 
   if (homepage) return homepage;
   if (repository) return convertRepositoryToUrl(repository, name);
