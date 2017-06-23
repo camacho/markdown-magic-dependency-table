@@ -1,4 +1,4 @@
-# Install command plugin
+# Dependency table
 
 Add a table of dependencies to markdown files via [markdown-magic](https://github.com/DavidWells/markdown-magic)
 
@@ -35,11 +35,11 @@ markdownMagic(markdownPath, config);
 <!-- AUTO-GENERATED-CONTENT:START (DEPENDENCYTABLE) -->
 | **Dependency** | **Description** | **Version** | **Type** |
 | -------------- | --------------- | ----------- | -------- |
- | [findup@^0.1.5](https://github.com/Filirom1/findup) | Walk up ancester's dir up to root | 0.1.5 | production | 
- | [get-installed-path@^2.0.3](https://github.com/tunnckoCore/get-installed-path) | Get installation path where the given package is installed. Works for globally and locally installed packages. Works on Windows too. | 2.0.3 | production | 
- | [semver@^5.3.0](https://github.com/npm/node-semver) | The semantic version parser used by npm. | 5.3.0 | production | 
- | [markdown-magic@^0.1.17](https://npmjs.org/package/markdown-magic) | Automatically update markdown files with content from external sources | 0.1.17 | dev | 
- | [prettier@^1.4.4](https://github.com/prettier/prettier) | Prettier is an opinionated JavaScript formatter | 1.4.4 | dev | 
+ | [findup@^0.1.5](https://github.com/Filirom1/findup) | Walk up ancester's dir up to root | 0.1.5 | production |
+ | [get-installed-path@^2.0.3](https://github.com/tunnckoCore/get-installed-path) | Get installation path where the given package is installed. Works for globally and locally installed packages. Works on Windows too. | 2.0.3 | production |
+ | [semver@^5.3.0](https://github.com/npm/node-semver) | The semantic version parser used by npm. | 5.3.0 | production |
+ | [markdown-magic@^0.1.17](https://npmjs.org/package/markdown-magic) | Automatically update markdown files with content from external sources | 0.1.17 | dev |
+ | [prettier@^1.4.4](https://github.com/prettier/prettier) | Prettier is an opinionated JavaScript formatter | 1.4.4 | dev |
 <!-- AUTO-GENERATED-CONTENT:END -->
 
 ## Options
