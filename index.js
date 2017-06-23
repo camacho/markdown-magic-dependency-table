@@ -6,7 +6,7 @@ const getInstalledPath = require('get-installed-path');
 
 const defaults = {
   optional: 'false',
-  development: 'false',
+  dev: 'false',
   peers: 'false',
   production: 'true',
 };
