@@ -80,7 +80,7 @@ const readDependencies = pkg => (manifest, type) => {
 
       const localPkg = JSON.parse(fs.readFileSync(localPkgPath, 'utf8'));
 
-      const { description, homepage, version, repository } = localPkg;
+      const { description, homepage, version, repository, license } = localPkg;
 
       return {
         name,
@@ -89,10 +89,19 @@ const readDependencies = pkg => (manifest, type) => {
         description,
         url: getPkgUrl(localPkg),
         dependencyType,
+        license
       };
     })
   );
 };
+
+function convertLicenseToUrl(spdx) {
+  if (spdx) {
+    const url = `https://spdx.org/licenses/${spdx}.html`;
+    return `[${spdx}](${url})`;
+  }
+  return 'None found'
+}
 
 function renderDependencies(dependency) {
   const {
@@ -102,6 +111,7 @@ function renderDependencies(dependency) {
     description,
     url,
     dependencyType,
+    license
   } = dependency;
 
   return [
@@ -110,6 +120,7 @@ function renderDependencies(dependency) {
     description,
     version,
     dependencyType,
+    convertLicenseToUrl(license),
     '',
   ].join(' | ');
 }
@@ -128,8 +139,8 @@ module.exports = function DEPENDENCYTABLE(content, _options = {}, config) {
   const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
 
   const headers = [
-    '| **Dependency** | **Description** | **Version** | **Type** |',
-    '| -------------- | --------------- | ----------- | -------- |',
+    '| **Dependency** | **Description** | **Version** | **Type** | **License** |',
+    '| -------------- | --------------- | ----------- | -------- | -------- |',
   ];
 
   const deps = ['production', 'peer', 'optional', 'dev']
