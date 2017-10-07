@@ -1,35 +1,38 @@
 {
   "name": "markdown-magic-dependency-table",
-  "version": "1.2.2",
   "description": "Generate table of information about dependencies automatically in markdown",
-  "main": "index.js",
-  "scripts": {
-    "docs": "node example.js",
-    "prepublish": "npm run docs",
-    "format": "prettier --single-quote --trailing-comma es5 --write index.js example.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com/camacho/markdown-magic-dependency-table.git"
-  },
-  "keywords": [
-    "markdown",
-    "dependency table",
-    "markdown magic"
-  ],
+  "version": "1.2.2",
   "author": "Patrick Camacho <patrick@daftdevelopers.com>",
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/camacho/markdown-magic-dependency-table/issues"
   },
-  "homepage": "https://github.com/camacho/markdown-magic-dependency-table#readme",
   "dependencies": {
     "findup": "^0.1.5",
     "get-installed-path": "^2.0.3",
     "semver": "^5.3.0"
   },
   "devDependencies": {
+    "jest": "21.2.1",
+    "jest-cli": "21.2.1",
     "markdown-magic": "^0.1.17",
     "prettier": "^1.4.4"
+  },
+  "homepage": "https://github.com/camacho/markdown-magic-dependency-table#readme",
+  "keywords": [
+    "dependency table",
+    "markdown",
+    "markdown magic"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/camacho/markdown-magic-dependency-table.git"
+  },
+  "scripts": {
+    "docs": "node example.js",
+    "format": "prettier --single-quote --trailing-comma es5 --write index.js example.js",
+    "prepublish": "npm run docs",
+    "test": "jest __tests__/license.spec.js"
   }
 }
