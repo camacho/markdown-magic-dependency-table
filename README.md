@@ -32,18 +32,18 @@ markdownMagic(markdownPath, config);
 
 ## Usage in markdown
 
-<!-- AUTO-GENERATED-CONTENT:START (DEPENDENCYTABLE:dev=true) -->
-| **Dependency** | **Description** | **Version** | **Type** |
-| -------------- | --------------- | ----------- | -------- |
- | [findup@^0.1.5](https://github.com/Filirom1/findup) | Walk up ancester's dir up to root | 0.1.5 | production | 
- | [get-installed-path@^2.0.3](https://github.com/tunnckoCore/get-installed-path) | Get installation path where the given package is installed. Works for globally and locally installed packages. Works on Windows too. | 2.0.3 | production | 
- | [semver@^5.3.0](https://github.com/npm/node-semver) | The semantic version parser used by npm. | 5.3.0 | production | 
- | [markdown-magic@^0.1.17](https://npmjs.org/package/markdown-magic) | Automatically update markdown files with content from external sources | 0.1.17 | dev | 
- | [prettier@^1.4.4](https://github.com/prettier/prettier) | Prettier is an opinionated JavaScript formatter | 1.4.4 | dev | 
+<!-- AUTO-GENERATED-CONTENT:START (DEPENDENCYTABLE) -->
+| **Dependency** | **Description** | **Version** | **License** | **Type** |
+| -------------- | --------------- | ----------- | ----------- | -------- |
+ | [find-up@^2.1.0](https://github.com/sindresorhus/find-up) | Find a file by walking up parent directories | 2.1.0 | MIT | production | 
+ | [get-installed-path@^2.0.3](https://github.com/tunnckoCore/get-installed-path) | Get installation path where the given package is installed. Works for globally and locally installed packages. Works on Windows too. | 2.0.3 | MIT | production | 
+ | [semver@^5.3.0](https://github.com/npm/node-semver) | The semantic version parser used by npm. | 5.3.0 | ISC | production | 
+ | [markdown-magic@^0.1.17](https://npmjs.org/package/markdown-magic) | Automatically update markdown files with content from external sources | 0.1.17 | MIT | dev | 
+ | [prettier@^1.4.4](https://github.com/prettier/prettier) | Prettier is an opinionated JavaScript formatter | 1.4.4 | MIT | dev | 
 <!-- AUTO-GENERATED-CONTENT:END -->
 
 ## Options
-* production (true) - include production dependencies
+* production (false) - include production dependencies
 * dev (false) - include development dependencies
 * optional (false) - include optional dependencies
 * peer (false) - include peer dependencies

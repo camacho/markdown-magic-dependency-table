@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const findup = require('findup');
+const findup = require('find-up');
 const semver = require('semver');
 const getInstalledPath = require('get-installed-path');
 
@@ -8,18 +8,15 @@ const defaults = {
   optional: 'false',
   dev: 'false',
   peers: 'false',
-  production: 'true',
+  production: 'false',
 };
 
 const npmPkgUrl = 'https://npmjs.org/package/';
 
 function findPkg(dir) {
-  try {
-    return path.join(findup.sync(dir, 'package.json'), 'package.json');
-  } catch (err) {
-    console.log(err);
-    throw new Error('No package.json file found');
-  }
+    const pkgPath = findup.sync('package.json', { cwd: dir });
+    if (!pkgPath) throw new Error('No package.json file found');
+    return pkgPath;
 }
 
 function sanitizeSemver(version, maxLength = 10, truncateStr = '...') {
@@ -51,6 +48,7 @@ function convertRepositoryToUrl(repository, name) {
   return repo;
 }
 
+
 function getPkgUrl(pkg) {
   const { name, repository, homepage, bugs } = pkg;
 
@@ -58,6 +56,10 @@ function getPkgUrl(pkg) {
   if (repository) return convertRepositoryToUrl(repository, name);
   if (bugs) return bugs.url || bugs;
   return `https://npmjs.org/package/${name}`;
+}
+
+function sanitizeLicense(license) {
+  return license ? license : 'UNLICENSED'
 }
 
 const readDependencies = pkg => (manifest, type) => {
@@ -80,7 +82,7 @@ const readDependencies = pkg => (manifest, type) => {
 
       const localPkg = JSON.parse(fs.readFileSync(localPkgPath, 'utf8'));
 
-      const { description, homepage, version, repository } = localPkg;
+      const { description, homepage, version, repository, license } = localPkg;
 
       return {
         name,
@@ -88,6 +90,7 @@ const readDependencies = pkg => (manifest, type) => {
         version,
         description,
         url: getPkgUrl(localPkg),
+        license: sanitizeLicense(license),
         dependencyType,
       };
     })
@@ -99,6 +102,7 @@ function renderDependencies(dependency) {
     name,
     semver,
     version,
+    license,
     description,
     url,
     dependencyType,
@@ -109,6 +113,7 @@ function renderDependencies(dependency) {
     `[${[name, semver].join('@')}](${url})`,
     description,
     version,
+    license,
     dependencyType,
     '',
   ].join(' | ');
@@ -128,12 +133,15 @@ module.exports = function DEPENDENCYTABLE(content, _options = {}, config) {
   const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
 
   const headers = [
-    '| **Dependency** | **Description** | **Version** | **Type** |',
-    '| -------------- | --------------- | ----------- | -------- |',
+    '| **Dependency** | **Description** | **Version** | **License** | **Type** |',
+    '| -------------- | --------------- | ----------- | ----------- | -------- |',
   ];
 
-  const deps = ['production', 'peer', 'optional', 'dev']
-    .filter(type => options[type] !== 'false')
+  const types = ['production', 'peer', 'optional', 'dev']
+  
+  const declaredTypes = types.filter(type => options[type] === 'true')
+
+  const deps = (declaredTypes.length ? declaredTypes : types)
     .concat([''])
     .reduce(readDependencies(pkg), [])
     .map(renderDependencies);
