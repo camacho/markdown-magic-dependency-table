@@ -73,9 +73,7 @@ const readDependencies = pkg => (manifest, type) => {
 
   return manifest.concat(
     Object.keys(dependencies || {}).map(name => {
-      const localPkgPath = findup.sync('package.json', {
-        cwd: require.resolve(name),
-      });
+      const localPkgPath = findup.sync(`node_modules/${name}/package.json`);
       const localPkg = JSON.parse(fs.readFileSync(localPkgPath, 'utf8'));
       const { description, homepage, version, repository, license } = localPkg;
 
