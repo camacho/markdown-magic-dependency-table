@@ -2,7 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const findup = require('find-up');
 const semver = require('semver');
-const getInstalledPath = require('get-installed-path');
 
 const defaults = {
   optional: 'false',
@@ -14,9 +13,9 @@ const defaults = {
 const npmPkgUrl = 'https://npmjs.org/package/';
 
 function findPkg(dir) {
-    const pkgPath = findup.sync('package.json', { cwd: dir });
-    if (!pkgPath) throw new Error('No package.json file found');
-    return pkgPath;
+  const pkgPath = findup.sync('package.json', { cwd: dir });
+  if (!pkgPath) throw new Error('No package.json file found');
+  return pkgPath;
 }
 
 function sanitizeSemver(version, maxLength = 10, truncateStr = '...') {
@@ -48,7 +47,6 @@ function convertRepositoryToUrl(repository, name) {
   return repo;
 }
 
-
 function getPkgUrl(pkg) {
   const { name, repository, homepage, bugs } = pkg;
 
@@ -59,7 +57,7 @@ function getPkgUrl(pkg) {
 }
 
 function sanitizeLicense(license) {
-  return license ? license : 'UNLICENSED'
+  return license ? license : 'UNLICENSED';
 }
 
 const readDependencies = pkg => (manifest, type) => {
@@ -75,13 +73,10 @@ const readDependencies = pkg => (manifest, type) => {
 
   return manifest.concat(
     Object.keys(dependencies || {}).map(name => {
-      const localPkgPath = path.join(
-        getInstalledPath.sync(name, { local: true }),
-        'package.json'
-      );
-
+      const localPkgPath = findup.sync('package.json', {
+        cwd: require.resolve(name),
+      });
       const localPkg = JSON.parse(fs.readFileSync(localPkgPath, 'utf8'));
-
       const { description, homepage, version, repository, license } = localPkg;
 
       return {
@@ -137,9 +132,9 @@ module.exports = function DEPENDENCYTABLE(content, _options = {}, config) {
     '| -------------- | --------------- | ----------- | ----------- | -------- |',
   ];
 
-  const types = ['production', 'peer', 'optional', 'dev']
-  
-  const declaredTypes = types.filter(type => options[type] === 'true')
+  const types = ['production', 'peer', 'optional', 'dev'];
+
+  const declaredTypes = types.filter(type => options[type] === 'true');
 
   const deps = (declaredTypes.length ? declaredTypes : types)
     .concat([''])
