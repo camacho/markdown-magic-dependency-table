@@ -60,7 +60,7 @@ function sanitizeLicense(license) {
   return license ? license : 'UNLICENSED';
 }
 
-const readDependencies = pkg => (manifest, type) => {
+const readDependencies = (pkg) => (manifest, type) => {
   const dependencyType = type || 'production';
 
   let dependencies;
@@ -72,7 +72,7 @@ const readDependencies = pkg => (manifest, type) => {
   }
 
   return manifest.concat(
-    Object.keys(dependencies || {}).map(name => {
+    Object.keys(dependencies || {}).map((name) => {
       const localPkgPath = findup.sync(`node_modules/${name}/package.json`);
       const localPkg = JSON.parse(fs.readFileSync(localPkgPath, 'utf8'));
       const { description, homepage, version, repository, license } = localPkg;
@@ -91,15 +91,8 @@ const readDependencies = pkg => (manifest, type) => {
 };
 
 function renderDependencies(dependency) {
-  const {
-    name,
-    semver,
-    version,
-    license,
-    description,
-    url,
-    dependencyType,
-  } = dependency;
+  const { name, semver, version, license, description, url, dependencyType } =
+    dependency;
 
   return [
     '',
@@ -132,7 +125,7 @@ module.exports = function DEPENDENCYTABLE(content, _options = {}, config) {
 
   const types = ['production', 'peer', 'optional', 'dev'];
 
-  const declaredTypes = types.filter(type => options[type] === 'true');
+  const declaredTypes = types.filter((type) => options[type] === 'true');
 
   const deps = (declaredTypes.length ? declaredTypes : types)
     .concat([''])
