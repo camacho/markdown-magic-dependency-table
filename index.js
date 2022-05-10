@@ -102,7 +102,7 @@ function renderDependencies(dependency) {
     license,
     dependencyType,
     '',
-  ].join(' | ');
+  ].join(' | ').trim();
 }
 
 module.exports = function DEPENDENCYTABLE(content, _options = {}, config) {
