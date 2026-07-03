@@ -1,7 +1,10 @@
-const fs = require('fs');
-const path = require('path');
-const findup = require('find-up');
-const semver = require('semver');
+import fs from 'fs';
+import path from 'path';
+import { createRequire } from 'module';
+import { findUpSync } from 'find-up';
+import semver from 'semver';
+
+const require = createRequire(import.meta.url);
 
 const defaults = {
   optional: 'false',
@@ -13,23 +16,20 @@ const defaults = {
 const npmPkgUrl = 'https://npmjs.org/package/';
 
 function findPkg(dir) {
-  const pkgPath = findup.sync('package.json', { cwd: dir });
+  const pkgPath = findUpSync('package.json', { cwd: dir });
   if (!pkgPath) throw new Error('No package.json file found');
   return pkgPath;
 }
 
 function sanitizeSemver(version, maxLength = 10, truncateStr = '...') {
   if (semver.valid(version)) return version;
-
-  const adjustedLength = maxLength - truncateStr.length;
-
-  return version.length > adjustedLength
-    ? [version.substr(0, adjustedLength), truncateStr].join('')
+  return version.length > maxLength
+    ? `${version.substr(0, maxLength - truncateStr.length)}${truncateStr}`
     : version;
 }
 
 function convertRepositoryToUrl(repository, name) {
-  let repo = (repository.url ? repository.url : repository).replace('.git', '');
+  let repo = (repository.url || repository).replace('.git', '');
 
   if (repo.startsWith('http')) {
     return repo;
@@ -53,47 +53,46 @@ function getPkgUrl(pkg) {
   if (homepage) return homepage;
   if (repository) return convertRepositoryToUrl(repository, name);
   if (bugs) return bugs.url || bugs;
+
   return `https://npmjs.org/package/${name}`;
 }
 
-function sanitizeLicense(license) {
-  return license ? license : 'UNLICENSED';
-}
+const readDependencies =
+  (pkg, pkgDir) =>
+  (manifest, dependencyType = 'production') => {
+    let dependencies;
 
-const readDependencies = (pkg) => (manifest, type) => {
-  const dependencyType = type || 'production';
+    if (dependencyType === 'production') {
+      dependencies = pkg.dependencies;
+    } else {
+      dependencies = pkg[`${dependencyType}Dependencies`];
+    }
 
-  let dependencies;
+    return manifest.concat(
+      Object.keys(dependencies || {}).map((name) => {
+        const localPkgPath = require.resolve(`${name}/package.json`, {
+          paths: [pkgDir],
+        });
+        const localPkg = JSON.parse(fs.readFileSync(localPkgPath, 'utf8'));
+        const { description, homepage, version, repository, license } =
+          localPkg;
 
-  if (type === 'production') {
-    dependencies = pkg.dependencies;
-  } else {
-    dependencies = pkg[`${type}Dependencies`];
-  }
-
-  return manifest.concat(
-    Object.keys(dependencies || {}).map((name) => {
-      const localPkgPath = findup.sync(`node_modules/${name}/package.json`);
-      const localPkg = JSON.parse(fs.readFileSync(localPkgPath, 'utf8'));
-      const { description, homepage, version, repository, license } = localPkg;
-
-      return {
-        name,
-        semver: sanitizeSemver(dependencies[name]),
-        version,
-        description,
-        url: getPkgUrl(localPkg),
-        license: sanitizeLicense(license),
-        dependencyType,
-      };
-    })
-  );
-};
+        return {
+          name,
+          semver: sanitizeSemver(dependencies[name]),
+          version,
+          description,
+          url: getPkgUrl(localPkg),
+          license: license ?? 'UNLICENSED',
+          dependencyType,
+        };
+      }),
+    );
+  };
 
 function renderDependencies(dependency) {
   const { name, semver, version, license, description, url, dependencyType } =
     dependency;
-
   return [
     '',
     `[${[name, semver].join('@')}](${url})`,
@@ -105,15 +104,15 @@ function renderDependencies(dependency) {
   ].join(' | ');
 }
 
-module.exports = function DEPENDENCYTABLE(content, _options = {}, config) {
-  const options = Object.assign({}, defaults, _options);
+export default function DEPENDENCYTABLE({ content, options = {}, srcPath }) {
+  const opts = Object.assign({}, defaults, options);
 
   let pkgPath;
 
-  if (options.pkg) {
-    pkgPath = path.resolve(path.dirname(config.originalPath), options.pkg);
+  if (opts.pkg) {
+    pkgPath = path.resolve(path.dirname(srcPath), opts.pkg);
   } else {
-    pkgPath = findPkg(config.originalPath);
+    pkgPath = findPkg(srcPath);
   }
 
   const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
@@ -125,12 +124,11 @@ module.exports = function DEPENDENCYTABLE(content, _options = {}, config) {
 
   const types = ['production', 'peer', 'optional', 'dev'];
 
-  const declaredTypes = types.filter((type) => options[type] === 'true');
+  const declaredTypes = types.filter((type) => opts[type] === 'true');
 
   const deps = (declaredTypes.length ? declaredTypes : types)
-    .concat([''])
-    .reduce(readDependencies(pkg), [])
+    .reduce(readDependencies(pkg, path.dirname(pkgPath)), [])
     .map(renderDependencies);
 
   return headers.concat(deps).join('\n');
-};
+}
