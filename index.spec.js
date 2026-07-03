@@ -20,6 +20,19 @@ describe('markdown-magic-dependency-table', () => {
     expect(result).toMatch(/production/);
   });
 
+  it('renders a dependency whose package restricts its exports map (e.g. find-up) without throwing', () => {
+    const result = format({
+      content: 'foo',
+      options: {
+        pkg: './__fixtures__/with-deps/package.json',
+        production: 'true',
+      },
+      srcPath,
+    });
+
+    expect(result).toMatch(/find-up/);
+  });
+
   it('never returns an empty string when no dependencies match the requested type', () => {
     const result = format({
       content: 'untouched',

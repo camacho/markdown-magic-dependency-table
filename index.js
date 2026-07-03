@@ -1,10 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import { createRequire } from 'module';
 import { findUpSync } from 'find-up';
 import semver from 'semver';
-
-const require = createRequire(import.meta.url);
 
 const defaults = {
   optional: 'false',
@@ -23,7 +20,7 @@ function findPkg(dir) {
 
 function sanitizeSemver(version, maxLength = 10, truncateStr = '...') {
   if (semver.valid(version)) return version;
-  return version.length > maxLength
+  return version.length > maxLength - truncateStr.length
     ? `${version.substr(0, maxLength - truncateStr.length)}${truncateStr}`
     : version;
 }
@@ -70,9 +67,23 @@ const readDependencies =
 
     return manifest.concat(
       Object.keys(dependencies || {}).map((name) => {
-        const localPkgPath = require.resolve(`${name}/package.json`, {
-          paths: [pkgDir],
-        });
+        const localPkgPath = findUpSync(
+          path.join('node_modules', name, 'package.json'),
+          { cwd: pkgDir },
+        );
+
+        if (!localPkgPath) {
+          return {
+            name,
+            semver: sanitizeSemver(dependencies[name]),
+            version: '-',
+            description: '-',
+            url: getPkgUrl({ name }),
+            license: '-',
+            dependencyType,
+          };
+        }
+
         const localPkg = JSON.parse(fs.readFileSync(localPkgPath, 'utf8'));
         const { description, homepage, version, repository, license } =
           localPkg;
