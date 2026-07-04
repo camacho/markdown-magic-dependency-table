@@ -1,0 +1,6 @@
+{
+  "name": "fixture-scoped-dep",
+  "dependencies": {
+    "@scope/pkg": "^1.0.0"
+  }
+}

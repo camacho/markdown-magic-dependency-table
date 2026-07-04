@@ -1,0 +1,6 @@
+{
+  "name": "fixture-license-fallback",
+  "dependencies": {
+    "no-license-pkg": "^1.0.0"
+  }
+}

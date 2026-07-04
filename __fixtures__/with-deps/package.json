@@ -1,0 +1,7 @@
+{
+  "name": "fixture-with-deps",
+  "dependencies": {
+    "semver": "^7.0.0",
+    "find-up": "^8.0.0"
+  }
+}

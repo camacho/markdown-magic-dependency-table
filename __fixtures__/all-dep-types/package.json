@@ -1,0 +1,15 @@
+{
+  "name": "fixture-all-dep-types",
+  "dependencies": {
+    "semver": "^7.0.0"
+  },
+  "devDependencies": {
+    "find-up": "^8.0.0"
+  },
+  "peerDependencies": {
+    "semver": "^7.0.0"
+  },
+  "optionalDependencies": {
+    "find-up": "^8.0.0"
+  }
+}
