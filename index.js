@@ -135,7 +135,10 @@ export default function DEPENDENCYTABLE({ content, options = {}, srcPath }) {
 
   const types = ['production', 'peer', 'optional', 'dev'];
 
-  const declaredTypes = types.filter((type) => opts[type] === 'true');
+  // the public option is `peers`; the internal type key is `peer`
+  const declaredTypes = types.filter(
+    (type) => opts[type === 'peer' ? 'peers' : type] === 'true',
+  );
 
   const deps = (declaredTypes.length ? declaredTypes : types)
     .reduce(readDependencies(pkg, path.dirname(pkgPath)), [])

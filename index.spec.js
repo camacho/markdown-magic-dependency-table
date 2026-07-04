@@ -184,13 +184,7 @@ describe('markdown-magic-dependency-table', () => {
       expect(result).not.toMatch(/\| peer \|/);
     });
 
-    it('has no filtering effect for the "peers" option (declared option key does not match the "peer" type name), so all types render', () => {
-      // The `types` array uses 'peer' but the option/default key is
-      // 'peers', so `opts['peer']` is always undefined and 'peer' can
-      // never enter `declaredTypes` via this option. When 'peers' is the
-      // only truthy option, `declaredTypes` ends up empty and the code
-      // falls back to rendering all four dependency types. This is
-      // pre-existing behavior, not something introduced or fixed here.
+    it('filters to only peerDependencies via the "peers" option', () => {
       const result = format({
         content: 'foo',
         options: {
@@ -200,10 +194,10 @@ describe('markdown-magic-dependency-table', () => {
         srcPath,
       });
 
-      expect(result).toMatch(/\| production \|/);
-      expect(result).toMatch(/\| dev \|/);
-      expect(result).toMatch(/\| optional \|/);
       expect(result).toMatch(/\| peer \|/);
+      expect(result).not.toMatch(/\| production \|/);
+      expect(result).not.toMatch(/\| dev \|/);
+      expect(result).not.toMatch(/\| optional \|/);
     });
 
     it('renders all four dependency types when no type option is set', () => {
