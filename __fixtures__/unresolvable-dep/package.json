@@ -1,0 +1,6 @@
+{
+  "name": "fixture-unresolvable-dep",
+  "dependencies": {
+    "totally-nonexistent-package-xyz-12345": "^1.0.0"
+  }
+}
