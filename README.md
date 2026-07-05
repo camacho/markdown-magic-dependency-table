@@ -1,3 +1,5 @@
+> **📦 This package has moved.** It now lives in the [markdown-magic-plugins](https://github.com/camacho/markdown-magic-plugins) monorepo at [`packages/dependency-table`](https://github.com/camacho/markdown-magic-plugins/tree/main/packages/dependency-table). This repository is archived; issues and contributions go to the monorepo.
+
 # Dependency table
 
 Add a table of dependencies to markdown files via [markdown-magic](https://github.com/DavidWells/markdown-magic)
